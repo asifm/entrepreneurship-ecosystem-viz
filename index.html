@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+        Visualizing metropolitan entrepreneurial ecosystems
+        </title>
+
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+        <!-- <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" /> -->
+
+        <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" type="text/css" />
+        <link rel="stylesheet" href="http://academy.cartodb.com/css/cdbui.css" type="text/css" />
+
+        <!-- Jquery and Jquery UI -->
+        <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+
+        <style type="text/css">
+            html, body, #map {
+                height: 100%;
+                padding: 0;
+                margin: 0;
+            }
+            #cartocss {
+                position: absolute;
+                bottom: 40px;
+                right: 20px;
+            }
+            #sql {
+                position: absolute;
+                bottom: 400px;
+                right: 20px;
+            }
+            .layer_selector {
+                background: rgba(255,255,255,0.9);
+                border-radius: 5px;
+                padding: 0;
+                border: 1px solid #999;
+                width: 250px;
+            }
+            
+            .layer_selector > p {
+                padding: 15px 15px;
+                border-bottom: 1px solid #999;
+            }
+            
+            .layer_selector ul {
+                padding: 0; margin: 0;
+                list-style-type: none;
+            }
+            .layer_selector li, #year {
+                padding: 10px 10px;
+                font-family: Helvetica, Arial;
+                font-size: 13px;
+                color: #444;
+                cursor: pointer;
+            }
+            .layer_selector li:not(:last-child) {
+                border-bottom: 1px solid #999;
+            }
+            .layer_selector li:hover {
+                background-color: #F0F0F0;
+                cursor: pointer;
+            }
+            
+            .layer_selector li.cartocss_selected {
+                background-color: #A6CEE3;
+            }
+            </style>
+           
+            
+        <style type="cartocss/html" id="estabs_entry_rate">
+            #msa_bds{
+              polygon-fill: #FFFFB2;
+              polygon-opacity: 0.8;
+              line-color: #FFF;
+              line-width: 0.5;
+              line-opacity: 1;
+            }
+            #msa_bds [ estabs_entry_rate > 18.5] {
+               polygon-fill: #B10026;
+            }
+            #msa_bds [ estabs_entry_rate <= 18.5] {
+               polygon-fill: #E31A1C;
+            }
+            #msa_bds [ estabs_entry_rate <= 15.6] {
+               polygon-fill: #FC4E2A;
+            }
+            #msa_bds [ estabs_entry_rate <= 13.5] {
+               polygon-fill: #FD8D3C;
+            }
+            #msa_bds [ estabs_entry_rate <= 11.5] {
+               polygon-fill: #FEB24C;
+            }
+            #msa_bds [ estabs_entry_rate <= 9.4] {
+               polygon-fill: #FED976;
+            }
+            #msa_bds [ estabs_entry_rate <= 7.4] {
+               polygon-fill: #FFFFB2;
+            }
+
+        </style>
+
+        <style type="cartocss/html" id="estabs_exit_rate">
+            #msa_bds{
+              polygon-fill: #FFFFB2;
+              polygon-opacity: 0.8;
+              line-color: #FFF;
+              line-width: 0.5;
+              line-opacity: 1;
+            }
+            #msa_bds [ estabs_exit_rate > 16.9] {
+               polygon-fill: #B10026;
+            }
+            #msa_bds [ estabs_exit_rate <= 16.9] {
+               polygon-fill: #E31A1C;
+            }
+            #msa_bds [ estabs_exit_rate <= 14.3] {
+               polygon-fill: #FC4E2A;
+            }
+            #msa_bds [ estabs_exit_rate <= 11.7] {
+               polygon-fill: #FD8D3C;
+            }
+            #msa_bds [ estabs_exit_rate <= 10.1] {
+               polygon-fill: #FEB24C;
+            }
+            #msa_bds [ estabs_exit_rate <= 8.6] {
+               polygon-fill: #FED976;
+            }
+            #msa_bds [ estabs_exit_rate <= 7.1] {
+               polygon-fill: #FFFFB2;
+            }
+        </style>
+        
+        <style type="cartocss/html" id="job_creation_rate">
+            #msa_bds{
+              polygon-fill: #FFFFB2;
+              polygon-opacity: 0.8;
+              line-color: #FFF;
+              line-width: 0.5;
+              line-opacity: 1;
+            }
+            #msa_bds [ job_creation_rate > 38.6] {
+               polygon-fill: #B10026;
+            }
+            #msa_bds [ job_creation_rate <= 38.6] {
+               polygon-fill: #E31A1C;
+            }
+            #msa_bds [ job_creation_rate <= 27.7] {
+               polygon-fill: #FC4E2A;
+            }
+            #msa_bds [ job_creation_rate <= 23.7] {
+               polygon-fill: #FD8D3C;
+            }
+            #msa_bds [ job_creation_rate <= 19.2] {
+               polygon-fill: #FEB24C;
+            }
+            #msa_bds [ job_creation_rate <= 14.5] {
+               polygon-fill: #FED976;
+            }
+            #msa_bds [ job_creation_rate <= 11.2] {
+               polygon-fill: #FFFFB2;
+            }
+        </style>
+
+        <style type="cartocss/html" id="job_creation_rate_births">
+
+            #msa_bds{
+              polygon-fill: #FFFFB2;
+              polygon-opacity: 0.8;
+              line-color: #FFF;
+              line-width: 0.5;
+              line-opacity: 1;
+            }
+            #msa_bds [ job_creation_rate_births > 19.8] {
+               polygon-fill: #B10026;
+            }
+            #msa_bds [ job_creation_rate_births <= 19.8] {
+               polygon-fill: #E31A1C;
+            }
+            #msa_bds [ job_creation_rate_births <= 14.8] {
+               polygon-fill: #FC4E2A;
+            }
+            #msa_bds [ job_creation_rate_births <= 12.2] {
+               polygon-fill: #FD8D3C;
+            }
+            #msa_bds [ job_creation_rate_births <= 9.3] {
+               polygon-fill: #FEB24C;
+            }
+            #msa_bds [ job_creation_rate_births <= 6.6] {
+               polygon-fill: #FED976;
+            }
+            #msa_bds [ job_creation_rate_births <= 4.1] {
+               polygon-fill: #FFFFB2;
+            }
+        </style>
+
+        <style type="cartocss/html" id="job_destruction_rate">
+
+            #msa_bds{
+              polygon-fill: #FFFFB2;
+              polygon-opacity: 0.8;
+              line-color: #FFF;
+              line-width: 0.5;
+              line-opacity: 1;
+            }
+            #msa_bds [ job_destruction_rate > 40.5] {
+               polygon-fill: #B10026;
+            }
+            #msa_bds [ job_destruction_rate <= 40.5] {
+               polygon-fill: #E31A1C;
+            }
+            #msa_bds [ job_destruction_rate <= 25.8] {
+               polygon-fill: #FC4E2A;
+            }
+            #msa_bds [ job_destruction_rate <= 22.8] {
+               polygon-fill: #FD8D3C;
+            }
+            #msa_bds [ job_destruction_rate <= 19.1] {
+               polygon-fill: #FEB24C;
+            }
+            #msa_bds [ job_destruction_rate <= 18.6] {
+               polygon-fill: #FED976;
+            }
+            #msa_bds [ job_destruction_rate <= 13.1] {
+               polygon-fill: #FFFFB2;
+            }
+        </style>
+
+        <style type="cartocss/html" id="job_destruction_rate_deaths">
+
+            #msa_bds{
+              polygon-fill: #FFFFB2;
+              polygon-opacity: 0.8;
+              line-color: #FFF;
+              line-width: 0.5;
+              line-opacity: 1;
+            }
+            #msa_bds [ job_destruction_rate_deaths > 21] {
+               polygon-fill: #B10026;
+            }
+            #msa_bds [ job_destruction_rate_deaths <= 21] {
+               polygon-fill: #E31A1C;
+            }
+            #msa_bds [ job_destruction_rate_deaths <= 14] {
+               polygon-fill: #FC4E2A;
+            }
+            #msa_bds [ job_destruction_rate_deaths <= 10.9] {
+               polygon-fill: #FD8D3C;
+            }
+            #msa_bds [ job_destruction_rate_deaths <= 8.5] {
+               polygon-fill: #FEB24C;
+            }
+            #msa_bds [ job_destruction_rate_deaths <= 5.9] {
+               polygon-fill: #FED976;
+            }
+            #msa_bds [ job_destruction_rate_deaths <= 3.7] {
+               polygon-fill: #FFFFB2;
+            }
+        </style>
+
+        <style type="cartocss/html" id="net_job_creation_rate">
+            #msa_bds{
+              polygon-fill: #FFFFB2;
+              polygon-opacity: 0.8;
+              line-color: #FFF;
+              line-width: 0.5;
+              line-opacity: 1;
+            }
+            #msa_bds [ net_job_creation_rate > 17.1] {
+               polygon-fill: #B10026;
+            }
+            #msa_bds [ net_job_creation_rate <= 17.1] {
+               polygon-fill: #E31A1C;
+            }
+            #msa_bds [ net_job_creation_rate <= 6] {
+               polygon-fill: #FC4E2A;
+            }
+            #msa_bds [ net_job_creation_rate <= -1.1] {
+               polygon-fill: #FD8D3C;
+            }
+            #msa_bds [ net_job_creation_rate <= -8.4] {
+               polygon-fill: #FEB24C;
+            }
+            #msa_bds [ net_job_creation_rate <= -8.9] {
+               polygon-fill: #FED976;
+            }
+            #msa_bds [ net_job_creation_rate <= -24.8] {
+               polygon-fill: #FFFFB2;
+            }
+        </style>
+
+    </head>
+    <body>
+        <div id="map"></div>
+        <div id="cartocss" class="layer_selector">
+            <ul>
+            <!-- Todo: add tool tip to explain/define. Use census bureau text. -->
+                <li data="estabs_entry_rate" data-type="cartocss">Establishment entry rate </li>
+                <li data="estabs_exit_rate" data-type="cartocss">Establishment exit rate </li>
+                <li data="job_creation_rate" data-type="cartocss">Job creation rate: all firms </li>
+                <li data="job_creation_rate_births" data-type="cartocss">Job creation rate: new firms </li>
+                <li data="job_destruction_rate" data-type="cartocss">Job destruction rate: all firms </li>
+                <li data="job_destruction_rate_deaths" data-type="cartocss">Job destruction rate: exiting firms </li>
+                <li data="net_job_creation_rate" data-type="cartocss">Net job creation rate </li>
+            </ul>
+        </div>
+
+        <div id="sql">
+            <form id="year_selector">
+            Select Year
+            <select name="year" id="year">
+                <option selected>1999</option>
+                <option>2000</option>
+                <option>2001</option>
+                <option>2002</option>
+                <option>2003</option>
+                <option>2004</option>
+                <option>2005</option>
+                <option>2006</option>
+                <option>2007</option>
+                <option>2008</option>
+                <option>2009</option>
+                <option>2010</option>
+                <option>2011</option>
+                <option>2012</option>
+                <option>2013</option>
+            </select>
+            </form>
+        </div>
+
+        <!-- include cartodb.js library -->
+        <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js" type="text/javascript"></script>
+        <!-- Place your code in the script tags below -->
+        <script type="text/javascript">
+        window.onload = function() {
+
+            // var tableName = "all_day_cdb_gu_l3";
+            var tableName = "msa_bds";
+
+            var layerSource = {
+                    user_name: 'asifm',
+                    type: 'cartodb',
+                    cartodb_logo: false,
+                    legends: true,
+                    sublayers: [{
+                        sql: "SELECT * FROM " + tableName, 
+                        cartocss: $("#estabs_entry_rate").html(), // Start with estabs_entry_rate
+                        interactivity: "name, estabs_entry_rate"
+                    }]
+            }
+            
+            // Instantiate new map object, place it in 'map' element
+            var map_object = new L.Map('map', {
+                center: [38,-90],
+                zoom: 5,
+                legends: true
+            });
+
+            
+                // Action to take when slider or related selection menu changes
+                var select = $("#year");
+                var yearSelected;
+                var slider = $("<div id='slider'></div>").insertAfter(select).slider({
+                    min: 1999,
+                    max: 2013,
+                    range: "min",
+                    value: select[0].value,
+                    slide: function(event, ui) {
+                        select[0].value = ui.value;
+                    }
+                });
+                 
+
+            // Create layer selector
+            function createSelector(layer) {
+                var condition = "";
+                var $options = $(".layer_selector").find("li");
+                $options.click(function(e) {
+                    var $li = $(e.target);
+                    var selected = $li.attr('data');
+                    var type = $li.data('type');
+                    layer.legends = true;
+                    
+                    $options.removeClass('cartocss_selected');
+                    $li.addClass('cartocss_selected');                      
+                    
+                    condition = $('#'+selected).text();
+                    
+                    layer.setCartoCSS(condition);
+                
+                });
+
+                // Select new sql based on year selected
+                $("#year").change(function() {
+                    slider.slider("value", this.value);
+                    yearSelected = this.value;
+                    layer.setSQL("SELECT * FROM " + tableName + " WHERE year=" + yearSelected);
+                });
+           
+                slider.on("slidechange", function(event, ui) {
+                    yearSelected = ui.value;
+                    layer.setSQL("SELECT * FROM " + tableName + " WHERE year=" + yearSelected);
+                });
+
+            }
+
+            // Pull tiles from CartoDB's basemaps
+            L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map_object);
+
+            // for storing sublayer outside of createlayer
+            var sublayers;
+
+            // Add data layer to your map
+            cartodb.createLayer(map_object,layerSource)
+                .addTo(map_object)
+                .done(function(layer) {
+                    sublayer = layer.getSubLayer(0);
+                    createSelector(sublayer);
+                    console.log(sublayer)
+                    // Not working
+                    // layer.on("featureClick", function(e, latlng, pos, data, subLayerIndex) {
+                    //     console.log(e, latlng, pos, data, subLayerIndex);
+                    // }) 
+                })
+                .error(function(err) {
+                    console.log("error: " + err);
+                });
+            }
+
+        </script>
+            
+            
+    </body>
+</html>
+
+<!-- todo: add infowindow -->
