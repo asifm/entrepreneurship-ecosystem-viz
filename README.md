@@ -1,1 +1,1 @@
-This repository contains the files for a website that aims to display entrepreneurial ecosystem data of US metropolitan statistical areas. The visualization uses a number of JavaScript libraries, chiefly d3.js, crossfilter.js, and dc.js. The data comes from a variety of public sources.
+This repository contains the files for a website that aims to display entrepreneurial ecosystem data of US metropolitan statistical areas. The visualizations employ the cartodb platform as well as a number of JavaScript libraries. The data come from a variety of public sources.
