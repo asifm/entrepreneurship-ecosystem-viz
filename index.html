@@ -18,7 +18,19 @@
         <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 
+        <!-- custom style -->
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="/css/main.css">
+
         <style type="text/css">
+            div.cartodb-tooltip {
+                overflow-y: visible; !important
+            }
+
+            div.cartodb-legend {
+                box-shadow: none; !important
+            }
+
             html, body, #map {
                 height: 100%;
                 padding: 0;
@@ -26,20 +38,21 @@
             }
             #cartocss {
                 position: absolute;
-                bottom: 40px;
+                bottom: 120px;
                 right: 20px;
             }
             #sql {
                 position: absolute;
-                bottom: 400px;
+                bottom: 470px;
                 right: 20px;
+                /*width: 250px;*/
             }
             .layer_selector {
                 background: rgba(255,255,255,0.9);
                 border-radius: 5px;
                 padding: 0;
                 border: 1px solid #999;
-                width: 250px;
+                width: 245px;
             }
             
             .layer_selector > p {
@@ -76,7 +89,7 @@
             #msa_bds{
               polygon-fill: #FFFFB2;
               polygon-opacity: 0.8;
-              line-color: #FFF;
+              line-color: #dddddd;
               line-width: 0.5;
               line-opacity: 1;
             }
@@ -108,7 +121,7 @@
             #msa_bds{
               polygon-fill: #FFFFB2;
               polygon-opacity: 0.8;
-              line-color: #FFF;
+              line-color: #dddddd;
               line-width: 0.5;
               line-opacity: 1;
             }
@@ -139,10 +152,13 @@
             #msa_bds{
               polygon-fill: #FFFFB2;
               polygon-opacity: 0.8;
-              line-color: #FFF;
+              line-color: #dddddd;
               line-width: 0.5;
               line-opacity: 1;
             }
+            
+
+
             #msa_bds [ job_creation_rate > 38.6] {
                polygon-fill: #B10026;
             }
@@ -171,7 +187,7 @@
             #msa_bds{
               polygon-fill: #FFFFB2;
               polygon-opacity: 0.8;
-              line-color: #FFF;
+              line-color: #dddddd;
               line-width: 0.5;
               line-opacity: 1;
             }
@@ -203,7 +219,7 @@
             #msa_bds{
               polygon-fill: #FFFFB2;
               polygon-opacity: 0.8;
-              line-color: #FFF;
+              line-color: #dddddd;
               line-width: 0.5;
               line-opacity: 1;
             }
@@ -235,7 +251,7 @@
             #msa_bds{
               polygon-fill: #FFFFB2;
               polygon-opacity: 0.8;
-              line-color: #FFF;
+              line-color: #dddddd;
               line-width: 0.5;
               line-opacity: 1;
             }
@@ -266,7 +282,7 @@
             #msa_bds{
               polygon-fill: #FFFFB2;
               polygon-opacity: 0.8;
-              line-color: #FFF;
+              line-color: #dddddd;
               line-width: 0.5;
               line-opacity: 1;
             }
@@ -299,19 +315,19 @@
         <div id="cartocss" class="layer_selector">
             <ul>
             <!-- Todo: add tool tip to explain/define. Use census bureau text. -->
-                <li data="estabs_entry_rate" data-type="cartocss">Establishment entry rate </li>
+                <li data="estabs_entry_rate" data-type="cartocss" class="cartocss_selected">Establishment entry rate </li>
                 <li data="estabs_exit_rate" data-type="cartocss">Establishment exit rate </li>
                 <li data="job_creation_rate" data-type="cartocss">Job creation rate: all firms </li>
                 <li data="job_creation_rate_births" data-type="cartocss">Job creation rate: new firms </li>
                 <li data="job_destruction_rate" data-type="cartocss">Job destruction rate: all firms </li>
                 <li data="job_destruction_rate_deaths" data-type="cartocss">Job destruction rate: exiting firms </li>
-                <li data="net_job_creation_rate" data-type="cartocss">Net job creation rate </li>
+                <li data="net_job_creation_rate" data-type="cartocss">Net job creation rate </li> 
             </ul>
         </div>
 
         <div id="sql">
             <form id="year_selector">
-            Select Year
+            <label for="year">&nbsp;&nbsp;&nbsp;&nbsp;Select Year</label>
             <select name="year" id="year">
                 <option selected>1999</option>
                 <option>2000</option>
@@ -338,42 +354,67 @@
         <script type="text/javascript">
         window.onload = function() {
 
-            // var tableName = "all_day_cdb_gu_l3";
-            var tableName = "msa_bds";
-
-            var layerSource = {
-                    user_name: 'asifm',
-                    type: 'cartodb',
-                    cartodb_logo: false,
-                    legends: true,
-                    sublayers: [{
-                        sql: "SELECT * FROM " + tableName, 
-                        cartocss: $("#estabs_entry_rate").html(), // Start with estabs_entry_rate
-                        interactivity: "name, estabs_entry_rate"
-                    }]
-            }
-            
             // Instantiate new map object, place it in 'map' element
             var map_object = new L.Map('map', {
-                center: [38,-90],
+                center: [38,-92],
                 zoom: 5,
-                legends: true
+                scrollWheelZoom: false
             });
 
-            
-                // Action to take when slider or related selection menu changes
-                var select = $("#year");
-                var yearSelected;
-                var slider = $("<div id='slider'></div>").insertAfter(select).slider({
-                    min: 1999,
-                    max: 2013,
-                    range: "min",
-                    value: select[0].value,
-                    slide: function(event, ui) {
-                        select[0].value = ui.value;
+            // todo: close info window automatically when variable/year clicked
+
+            // Set max and min zoom
+            // Pull tiles from CartoDB's basemaps
+            L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map_object);
+
+
+            // var tableName = "all_day_cdb_gu_l3";
+            var tableName = "msa_bds";
+            var yearSelected = 1999;
+
+    
+
+
+            var layerSource = {
+                user_name: 'asifm',
+                type: 'cartodb',
+                cartodb_logo: false,
+                legends: true, // not working
+                sublayers: [
+                    {
+                      type: "http",
+                      urlTemplate: "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png",
+                      subdomains: [ "a", "b", "c" ]
+                    },
+                    {
+                        sql: "SELECT * FROM " + tableName + " WHERE year=" + yearSelected, 
+                        cartocss: $("#estabs_entry_rate").html(), // Start with estabs_entry_rate
+                        interactivity: "name, estabs_entry_rate, estabs_exit_rate, job_creation_rate, job_creation_rate_births, job_destruction_rate, job_destruction_rate_deaths, net_job_creation_rate"
+                    },
+                    {
+                        type: "http",
+                        urlTemplate: "http://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png",
+                        subdomains: [ "a", "b", "c" ]
                     }
-                });
-                 
+                ]
+            }
+
+            
+            
+            // Insert slider (jquery ui)
+            var select = $("#year");
+            var slider = $("<div id='slider'></div>").insertAfter(select).slider({
+                min: 1999,
+                max: 2013,
+                range: "min",
+                value: select[0].value,
+                slide: function(event, ui) {
+                    select[0].value = ui.value;
+                }
+            });
+            
 
             // Create layer selector
             function createSelector(layer) {
@@ -383,18 +424,25 @@
                     var $li = $(e.target);
                     var selected = $li.attr('data');
                     var type = $li.data('type');
-                    layer.legends = true;
+                    // console.log(low_point, high_point)
                     
                     $options.removeClass('cartocss_selected');
                     $li.addClass('cartocss_selected');                      
                     
                     condition = $('#'+selected).text();
-                    
                     layer.setCartoCSS(condition);
-                
+                    
+                    // if (selected == 'estabs_entry_rate') {
+                    //     layer.low_point = 23;
+                    //     layer.high_point = 234;
+                    // } else {
+                    //     if (selected == 'estabs_exit_rate') {
+                    //         layer.low_point = 53;
+                    //         layer.high_point = 23423;
+                    //     }
+                    // }
                 });
-
-                // Select new sql based on year selected
+                
                 $("#year").change(function() {
                     slider.slider("value", this.value);
                     yearSelected = this.value;
@@ -405,38 +453,91 @@
                     yearSelected = ui.value;
                     layer.setSQL("SELECT * FROM " + tableName + " WHERE year=" + yearSelected);
                 });
-
+                
             }
 
-            // Pull tiles from CartoDB's basemaps
-            L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map_object);
-
             // for storing sublayer outside of createlayer
-            var sublayers;
+            var sublayer;
+            
+            
 
             // Add data layer to your map
             cartodb.createLayer(map_object,layerSource)
                 .addTo(map_object)
                 .done(function(layer) {
-                    sublayer = layer.getSubLayer(0);
+                    sublayer = layer.getSubLayer(1);
                     createSelector(sublayer);
-                    console.log(sublayer)
-                    // Not working
-                    // layer.on("featureClick", function(e, latlng, pos, data, subLayerIndex) {
-                    //     console.log(e, latlng, pos, data, subLayerIndex);
-                    // }) 
+
+                    // console.log(sublayer.low_point, sublayer.high_point);
+                    // Todo: change low and high to reflect actual data
+                    var legend = new cdb.geo.ui.Legend.Density({
+                        type: "custom",
+                        left: "low",
+                        right: "high",
+                        colors: ['#FFFFB2', '#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#B10026']                           
+                    });
+                    $('#map').append(legend.render().el);
+
+                    var toolTip = layer.leafletMap.viz.addOverlay({
+                        type: 'tooltip',
+                        layer: layer,
+                        template: $('#infowindow_template').html(),
+                        position: 'bottom|right',
+                        fields: [{}]
+                    });
+                    $('body').append(toolTip.render().el);
+
+                    
                 })
                 .error(function(err) {
                     console.log("error: " + err);
                 });
-            }
 
+
+
+                // sql = cartodb.SQL({user: 'asifm'});
+                // sqlval = sql.execute("SELECT * FROM " + tableName + " WHERE year=2013").done(function(data) {
+                //     console.log(data);
+                // });
+                
+            }
+        
         </script>
-            
-            
+
+
+
+        <script type="infowindow/html" id="infowindow_template">
+        <div class="cartodb-popup">
+            <a href="#close" class="cartodb-popup-close-button close">x</a>
+
+             <div class="cartodb-tooltip-content-wrapper">
+                <div class="cartodb-tooltip-content">
+                    <p><strong>{{name}}</strong></p>
+                    <h4>Establishment entry rate</h4>
+                    <p>{{estabs_entry_rate}}</p>
+                    <h4>Establishment exit rate</h4>
+                    <p>{{estabs_exit_rate}}</p>
+                    <h4>Job creation rate</h4>
+                    <p>{{job_creation_rate}}</p>
+                    <h4>Job creation rate: new firms</h4>
+                    <p>{{job_creation_rate_births}}</p>
+                    <h4>Job destruction rate</h4>
+                    <p>{{job_destruction_rate}}</p>
+                    <h4>Job destruction rate: exiting firms</h4>
+                    <p>{{job_destruction_rate_deaths}}</p>
+                    <h4>Net job creation rate</h4>
+                    <p>{{net_job_creation_rate}}</p>
+                </div>
+            </div>
+            <div class="cartodb-popup-tip-container"></div>
+        </div>
+        </script>
+                    
     </body>
 </html>
 
-<!-- todo: add infowindow -->
+<!-- Todo: overlay research universities -->
+<!-- // Todo: display table of top 5 cities with selected variables
+                // http://bl.ocks.org/andrewxhill/9134155
+                // 
+                // Select new sql based on year selected -->
