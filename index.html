@@ -17,12 +17,27 @@
         <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
         <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+        
+        <!-- Bootstrap -->
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 
         <!-- custom style -->
         <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-        <link rel="stylesheet" href="/css/main.css">
+        
 
+
+        
         <style type="text/css">
+            body {
+                font-family: 'Open Sans', sans-serif;
+            }
+            
+            .modal-content {
+                max-height: 1200px;
+                max-width: 800px;
+            }
+            
             div.cartodb-tooltip {
                 overflow-y: visible; !important
             }
@@ -36,16 +51,26 @@
                 padding: 0;
                 margin: 0;
             }
-            #cartocss {
+            #defbutton {
                 position: absolute;
                 bottom: 120px;
+                right: 20px;
+                width: 240px;
+            }
+            #cartocss {
+                position: absolute;
+                bottom: 170px;
                 right: 20px;
             }
             #sql {
                 position: absolute;
                 bottom: 470px;
                 right: 20px;
-                /*width: 250px;*/
+            }
+            #reset-zoom {
+                position: absolute;
+                bottom: 550px;
+                right: 20px;
             }
             .layer_selector {
                 background: rgba(255,255,255,0.9);
@@ -93,10 +118,10 @@
               line-width: 0.5;
               line-opacity: 1;
             }
-            #msa_bds [ estabs_entry_rate > 18.5] {
+            #msa_bds [ estabs_entry_rate > 18] {
                polygon-fill: #B10026;
             }
-            #msa_bds [ estabs_entry_rate <= 18.5] {
+            #msa_bds [ estabs_entry_rate <= 18] {
                polygon-fill: #E31A1C;
             }
             #msa_bds [ estabs_entry_rate <= 15.6] {
@@ -111,7 +136,7 @@
             #msa_bds [ estabs_entry_rate <= 9.4] {
                polygon-fill: #FED976;
             }
-            #msa_bds [ estabs_entry_rate <= 7.4] {
+            #msa_bds [ estabs_entry_rate <= 7] {
                polygon-fill: #FFFFB2;
             }
 
@@ -125,10 +150,10 @@
               line-width: 0.5;
               line-opacity: 1;
             }
-            #msa_bds [ estabs_exit_rate > 16.9] {
+            #msa_bds [ estabs_exit_rate > 17] {
                polygon-fill: #B10026;
             }
-            #msa_bds [ estabs_exit_rate <= 16.9] {
+            #msa_bds [ estabs_exit_rate <= 17] {
                polygon-fill: #E31A1C;
             }
             #msa_bds [ estabs_exit_rate <= 14.3] {
@@ -143,7 +168,7 @@
             #msa_bds [ estabs_exit_rate <= 8.6] {
                polygon-fill: #FED976;
             }
-            #msa_bds [ estabs_exit_rate <= 7.1] {
+            #msa_bds [ estabs_exit_rate <= 7] {
                polygon-fill: #FFFFB2;
             }
         </style>
@@ -159,7 +184,7 @@
             
 
 
-            #msa_bds [ job_creation_rate > 38.6] {
+            #msa_bds [ job_creation_rate > 39] {
                polygon-fill: #B10026;
             }
             #msa_bds [ job_creation_rate <= 38.6] {
@@ -177,7 +202,7 @@
             #msa_bds [ job_creation_rate <= 14.5] {
                polygon-fill: #FED976;
             }
-            #msa_bds [ job_creation_rate <= 11.2] {
+            #msa_bds [ job_creation_rate <= 11] {
                polygon-fill: #FFFFB2;
             }
         </style>
@@ -191,10 +216,10 @@
               line-width: 0.5;
               line-opacity: 1;
             }
-            #msa_bds [ job_creation_rate_births > 19.8] {
+            #msa_bds [ job_creation_rate_births > 20] {
                polygon-fill: #B10026;
             }
-            #msa_bds [ job_creation_rate_births <= 19.8] {
+            #msa_bds [ job_creation_rate_births <= 20] {
                polygon-fill: #E31A1C;
             }
             #msa_bds [ job_creation_rate_births <= 14.8] {
@@ -209,7 +234,7 @@
             #msa_bds [ job_creation_rate_births <= 6.6] {
                polygon-fill: #FED976;
             }
-            #msa_bds [ job_creation_rate_births <= 4.1] {
+            #msa_bds [ job_creation_rate_births <= 4] {
                polygon-fill: #FFFFB2;
             }
         </style>
@@ -223,10 +248,10 @@
               line-width: 0.5;
               line-opacity: 1;
             }
-            #msa_bds [ job_destruction_rate > 40.5] {
+            #msa_bds [ job_destruction_rate > 41] {
                polygon-fill: #B10026;
             }
-            #msa_bds [ job_destruction_rate <= 40.5] {
+            #msa_bds [ job_destruction_rate <= 41] {
                polygon-fill: #E31A1C;
             }
             #msa_bds [ job_destruction_rate <= 25.8] {
@@ -241,7 +266,7 @@
             #msa_bds [ job_destruction_rate <= 18.6] {
                polygon-fill: #FED976;
             }
-            #msa_bds [ job_destruction_rate <= 13.1] {
+            #msa_bds [ job_destruction_rate <= 13] {
                polygon-fill: #FFFFB2;
             }
         </style>
@@ -273,7 +298,7 @@
             #msa_bds [ job_destruction_rate_deaths <= 5.9] {
                polygon-fill: #FED976;
             }
-            #msa_bds [ job_destruction_rate_deaths <= 3.7] {
+            #msa_bds [ job_destruction_rate_deaths <= 4] {
                polygon-fill: #FFFFB2;
             }
         </style>
@@ -286,10 +311,10 @@
               line-width: 0.5;
               line-opacity: 1;
             }
-            #msa_bds [ net_job_creation_rate > 17.1] {
+            #msa_bds [ net_job_creation_rate > 17] {
                polygon-fill: #B10026;
             }
-            #msa_bds [ net_job_creation_rate <= 17.1] {
+            #msa_bds [ net_job_creation_rate <= 17] {
                polygon-fill: #E31A1C;
             }
             #msa_bds [ net_job_creation_rate <= 6] {
@@ -304,7 +329,7 @@
             #msa_bds [ net_job_creation_rate <= -8.9] {
                polygon-fill: #FED976;
             }
-            #msa_bds [ net_job_creation_rate <= -24.8] {
+            #msa_bds [ net_job_creation_rate <= -25] {
                polygon-fill: #FFFFB2;
             }
         </style>
@@ -314,7 +339,7 @@
         <div id="map"></div>
         <div id="cartocss" class="layer_selector">
             <ul>
-            <!-- Todo: add tool tip to explain/define. Use census bureau text. -->
+            
                 <li data="estabs_entry_rate" data-type="cartocss" class="cartocss_selected">Establishment entry rate </li>
                 <li data="estabs_exit_rate" data-type="cartocss">Establishment exit rate </li>
                 <li data="job_creation_rate" data-type="cartocss">Job creation rate: all firms </li>
@@ -358,23 +383,15 @@
             var map_object = new L.Map('map', {
                 center: [38,-92],
                 zoom: 5,
+                minZoom: 4,
+                boxZoom: true,
                 scrollWheelZoom: false
             });
-
-            // todo: close info window automatically when variable/year clicked
-
-            // Set max and min zoom
-            // Pull tiles from CartoDB's basemaps
-            L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map_object);
 
 
             // var tableName = "all_day_cdb_gu_l3";
             var tableName = "msa_bds";
             var yearSelected = 1999;
-
-    
 
 
             var layerSource = {
@@ -389,19 +406,20 @@
                       subdomains: [ "a", "b", "c" ]
                     },
                     {
-                        sql: "SELECT * FROM " + tableName + " WHERE year=" + yearSelected, 
-                        cartocss: $("#estabs_entry_rate").html(), // Start with estabs_entry_rate
-                        interactivity: "name, estabs_entry_rate, estabs_exit_rate, job_creation_rate, job_creation_rate_births, job_destruction_rate, job_destruction_rate_deaths, net_job_creation_rate"
+                      sql: "SELECT * FROM " + tableName + " WHERE year=" + yearSelected, 
+                      cartocss: $("#estabs_entry_rate").html(), // Start with estabs_entry_rate
+                      interactivity: "name, estabs_entry_rate, estabs_exit_rate, job_creation_rate, job_creation_rate_births, job_destruction_rate, job_destruction_rate_deaths, net_job_creation_rate"
                     },
                     {
-                        type: "http",
-                        urlTemplate: "http://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png",
-                        subdomains: [ "a", "b", "c" ]
+                      type: "http",
+                      urlTemplate: "http://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png",
+                      subdomains: [ "a", "b", "c" ]
                     }
                 ]
             }
 
-            
+            var low_point = 7;
+            var high_point = 18;
             
             // Insert slider (jquery ui)
             var select = $("#year");
@@ -424,23 +442,52 @@
                     var $li = $(e.target);
                     var selected = $li.attr('data');
                     var type = $li.data('type');
-                    // console.log(low_point, high_point)
+
+                    switch (selected) {
+                        case 'estabs_entry_rate':
+                            low_point = 7;
+                            high_point = 19;
+                            break;
+                        case 'estabs_exit_rate':
+                            low_point = 7;
+                            high_point = 17;
+                            break;
+                        case 'job_creation_rate':
+                            low_point = 11;
+                            high_point = 39;
+                            break;
+                        case 'job_creation_rate_births':
+                            low_point = 4;
+                            high_point = 20;
+                            break;
+                        case 'job_destruction_rate':
+                            low_point = 13;
+                            high_point = 41;
+                            break;
+                        case 'job_destruction_rate_deaths':
+                            low_point = 4;
+                            high_point = 21;
+                            break;
+                        case 'net_job_creation_rate':
+                            low_point = -25;
+                            high_point = 17;
+                            break;
+                    }
                     
+
                     $options.removeClass('cartocss_selected');
                     $li.addClass('cartocss_selected');                      
                     
                     condition = $('#'+selected).text();
                     layer.setCartoCSS(condition);
                     
-                    // if (selected == 'estabs_entry_rate') {
-                    //     layer.low_point = 23;
-                    //     layer.high_point = 234;
-                    // } else {
-                    //     if (selected == 'estabs_exit_rate') {
-                    //         layer.low_point = 53;
-                    //         layer.high_point = 23423;
-                    //     }
-                    // }
+                    var legend = new cdb.geo.ui.Legend.Density({
+                        type: "custom",
+                        left: "< " + low_point,
+                        right: "> " + high_point,
+                        colors: ['#FFFFB2', '#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#B10026']                           
+                    });
+                    $('#map').append(legend.render().el);
                 });
                 
                 $("#year").change(function() {
@@ -459,21 +506,17 @@
             // for storing sublayer outside of createlayer
             var sublayer;
             
-            
-
             // Add data layer to your map
             cartodb.createLayer(map_object,layerSource)
                 .addTo(map_object)
                 .done(function(layer) {
                     sublayer = layer.getSubLayer(1);
                     createSelector(sublayer);
-
-                    // console.log(sublayer.low_point, sublayer.high_point);
-                    // Todo: change low and high to reflect actual data
+                    
                     var legend = new cdb.geo.ui.Legend.Density({
                         type: "custom",
-                        left: "low",
-                        right: "high",
+                        left: "< " + low_point,
+                        right: "> " + high_point,
                         colors: ['#FFFFB2', '#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#B10026']                           
                     });
                     $('#map').append(legend.render().el);
@@ -487,21 +530,23 @@
                     });
                     $('body').append(toolTip.render().el);
 
-                    
+                    var v = new cdb.vis.Overlay.create('search', map_object.viz, {});
+                    v.show();
+                    $('#map').append(v.render().el);
                 })
                 .error(function(err) {
                     console.log("error: " + err);
                 });
 
 
-
+                $('#reset-zoom').click(function() {
+                    map_object.setView([38,-92], 5)
+                })
                 // sql = cartodb.SQL({user: 'asifm'});
                 // sqlval = sql.execute("SELECT * FROM " + tableName + " WHERE year=2013").done(function(data) {
                 //     console.log(data);
-                // });
-                
+                // });   
             }
-        
         </script>
 
 
@@ -532,7 +577,54 @@
             <div class="cartodb-popup-tip-container"></div>
         </div>
         </script>
-                    
+    <button type="button" class="btn btn-sm" id="reset-zoom">Reset View</button>    
+    <button type="button" class="btn btn-sm" data-toggle="modal" data-target="#definition" id="defbutton">Variable Definitions</button>
+
+         <!-- Modal -->
+  <div class="modal fade" id="definition" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h5 class="modal-title">Definitions</h5>
+        </div>
+        <div class="modal-body">
+
+            <p>Some definitions below use the term <em>denom</em>, which is Davis-Haltiwanger-Schuh (DHS) denominator. For time t, denom is the average of employment for times t and t-1.</p>
+
+            <dl>
+            <dt>Establishment entry rate</dt>
+            <dd>100 * (estabs_entry at time t divided by the average of estabs at t and t-1). Here <em>estabs</em> is a simple count of the number of establishments and <em>estabs_entry</em> is a count of establishments born during the last 12 months.</dd>
+
+            <dt>Establishment exit rate</dt>
+            <dd>100 * (estabs_exit at time t  divided by the average of estabs at t and t-1). Here <em>estabs</em> is a simple count of the number of establishments and </em>estabs_exit</em> is a count of establishments exiting during the last 12 months.</dd>
+            
+            <dt>Job creation rate: all firms</dt>
+            <dd>100 * (Count of all jobs created over the last 12 months / denom)</dd>
+
+            <dt>Job creation rate: new firms</dt>
+            <dd>100 * (Count of jobs created by establishment births over the last 12 months / denom)</dd>
+
+            <dt>Job destruction rate: all firms</dt>
+            <dd>100 * (Count of all jobs destroyed over the last 12 months / denom)</dd>
+
+            <dt>Job destruction rate: exiting firms</dt>
+            <dd>100 * (Count of jobs destroyed by establishment exit over the last 12 months / denom)</dd>
+
+            <dt>Net job creation rate</dt>
+            <dd>job_creation_rate - job_destruction_rate</dd>
+            </dl>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<small>Map created by Asif Mehedi (Batten Institute, Darden School of Business, University of Virginia) based on data from the US Census Bureau's Business Dynamics Statistics.</small>
+</div>
+
     </body>
 </html>
 
