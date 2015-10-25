@@ -57,6 +57,12 @@
                 right: 20px;
                 width: 240px;
             }
+            #research-univ{
+                position: absolute;
+                bottom: 20px;
+                left: 20px;
+                /*width: 240px;   */
+            }
             #cartocss {
                 position: absolute;
                 bottom: 170px;
@@ -332,6 +338,24 @@
             #msa_bds [ net_job_creation_rate <= -25] {
                polygon-fill: #FFFFB2;
             }
+
+        </style>
+
+        <style type="cartocss/html" id="research_univ">
+            /** simple visualization */
+
+            #research_univ {
+              marker-file: url(http://com.cartodb.users-assets.production.s3.amazonaws.com/simpleicon/building22.svg);
+              marker-fill-opacity: 0.8;
+              marker-line-color: #FFF;
+              marker-line-width: 0;
+              marker-line-opacity: 0.9;
+              marker-placement: point;
+              marker-type: ellipse;
+              marker-width: 10;
+              marker-fill: #000000;
+              marker-allow-overlap: true;
+            }
         </style>
 
     </head>
@@ -384,6 +408,7 @@
                 center: [38,-92],
                 zoom: 5,
                 minZoom: 4,
+                maxZoom: 8,
                 boxZoom: true,
                 scrollWheelZoom: false
             });
@@ -414,9 +439,10 @@
                       type: "http",
                       urlTemplate: "http://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png",
                       subdomains: [ "a", "b", "c" ]
-                    }
+                    },
+
                 ]
-            }
+            };
 
             var low_point = 7;
             var high_point = 18;
@@ -469,7 +495,7 @@
                             high_point = 21;
                             break;
                         case 'net_job_creation_rate':
-                            low_point = -25;
+                            low_point = "–25";
                             high_point = 17;
                             break;
                     }
@@ -504,15 +530,27 @@
             }
 
             // for storing sublayer outside of createlayer
-            var sublayer;
+            var sublayers;
             
             // Add data layer to your map
             cartodb.createLayer(map_object,layerSource)
                 .addTo(map_object)
                 .done(function(layer) {
-                    sublayer = layer.getSubLayer(1);
-                    createSelector(sublayer);
+                    sublayers = layer.getSubLayers();
+                    createSelector(sublayers[1]);
+                   
+                    var research_univ = layer.createSubLayer({
+                        sql: "SELECT * FROM research_univ",
+                        cartocss: $("#research_univ").html(),
+                        interactivity: "name, city, state"
+                    });
                     
+                    research_univ.hide(); // start with layer hidden
+
+                    $('#research-univ').click(function() {
+                        research_univ.toggle();
+                    })
+
                     var legend = new cdb.geo.ui.Legend.Density({
                         type: "custom",
                         left: "< " + low_point,
@@ -520,7 +558,7 @@
                         colors: ['#FFFFB2', '#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#B10026']                           
                     });
                     $('#map').append(legend.render().el);
-
+                        
                     var toolTip = layer.leafletMap.viz.addOverlay({
                         type: 'tooltip',
                         layer: layer,
@@ -529,7 +567,7 @@
                         fields: [{}]
                     });
                     $('body').append(toolTip.render().el);
-
+                    
                     var v = new cdb.vis.Overlay.create('search', map_object.viz, {});
                     v.show();
                     $('#map').append(v.render().el);
@@ -537,7 +575,6 @@
                 .error(function(err) {
                     console.log("error: " + err);
                 });
-
 
                 $('#reset-zoom').click(function() {
                     map_object.setView([38,-92], 5)
@@ -549,12 +586,8 @@
             }
         </script>
 
-
-
         <script type="infowindow/html" id="infowindow_template">
         <div class="cartodb-popup">
-            <a href="#close" class="cartodb-popup-close-button close">x</a>
-
              <div class="cartodb-tooltip-content-wrapper">
                 <div class="cartodb-tooltip-content">
                     <p><strong>{{name}}</strong></p>
@@ -577,7 +610,9 @@
             <div class="cartodb-popup-tip-container"></div>
         </div>
         </script>
+
     <button type="button" class="btn btn-sm" id="reset-zoom">Reset View</button>    
+    <button type="button" class="btn btn-sm" id="research-univ">Universities with high research activity</button>
     <button type="button" class="btn btn-sm" data-toggle="modal" data-target="#definition" id="defbutton">Variable Definitions</button>
 
          <!-- Modal -->
@@ -596,8 +631,8 @@
 
             <dl>
             <dt>Establishment entry rate</dt>
-            <dd>100 * (estabs_entry at time t divided by the average of estabs at t and t-1). Here <em>estabs</em> is a simple count of the number of establishments and <em>estabs_entry</em> is a count of establishments born during the last 12 months.</dd>
-
+            <dd>100 * (estabs_entry at time t divided by the average of estabs at t and t-1). Here <em>estabs</em> is a simple count of the number of establishments and <em>estabs_entry</em> is a count of establishments born during the last 12 months. <br></dd>
+            
             <dt>Establishment exit rate</dt>
             <dd>100 * (estabs_exit at time t  divided by the average of estabs at t and t-1). Here <em>estabs</em> is a simple count of the number of establishments and </em>estabs_exit</em> is a count of establishments exiting during the last 12 months.</dd>
             
@@ -633,3 +668,5 @@
                 // http://bl.ocks.org/andrewxhill/9134155
                 // 
                 // Select new sql based on year selected -->
+
+<!-- todo: turn off button for info window -->
